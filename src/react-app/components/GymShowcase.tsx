@@ -6,6 +6,8 @@ interface GymShowcaseProps {
 }
 
 export default function GymShowcase({ scrollY }: GymShowcaseProps) {
+    void scrollY; // mark as used
+
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isVisible, setIsVisible] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);

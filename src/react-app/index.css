@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-black text-white;
+  overflow-x: hidden;
+}
+
+@layer utilities {
+  .text-gradient-lime {
+    @apply bg-gradient-to-r from-lime-400 to-lime-300 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-blue {
+    @apply bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent;
+  }
+  
+  .glow-lime {
+    box-shadow: 0 0 20px rgba(163, 230, 53, 0.3);
+  }
+  
+  .glow-blue {
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+  }
+  
+  .border-glow-lime {
+    border-color: #a3e635;
+    box-shadow: 0 0 10px rgba(163, 230, 53, 0.5);
+  }
+  
+  .border-glow-blue {
+    border-color: #22d3ee;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+  }
+}
+
+.bebas {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 0.05em;
+}

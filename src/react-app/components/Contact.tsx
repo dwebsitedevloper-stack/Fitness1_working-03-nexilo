@@ -1,8 +1,10 @@
 import { MapPin, Phone, Mail, Clock, Instagram, Facebook, Youtube } from 'lucide-react';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, FormEvent } from 'react';
 
 export default function Contact() {
   const [isVisible, setIsVisible] = useState(false);
+  const [formStatus, setFormStatus] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -21,6 +23,59 @@ export default function Contact() {
 
     return () => observer.disconnect();
   }, []);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setFormStatus("");
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const searchParams = new URLSearchParams();
+
+    // Convert FormData to URLSearchParams
+    formData.forEach((value, key) => {
+      searchParams.append(key, value.toString());
+    });
+
+    try {
+      const response = await fetch(
+        'https://script.google.com/macros/s/AKfycbw7MM5zpd7V_N7tb06JRgkeWAs6IDK2ZXIeeLxIKfu6TQilcidM4E7Uelf1Ar6x0zAJPA/exec',
+        {
+          method: 'POST',
+          body: searchParams,
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.result === "success") {
+        setFormStatus("Message sent successfully! We'll get back to you soon.");
+        form.reset();
+        
+        // Clear status message after 3 seconds
+        setTimeout(() => {
+          setFormStatus("");
+        }, 3000);
+      } else {
+        setFormStatus(`Error: ${result.error || 'Something went wrong'}`);
+        
+        // Clear error message after 3 seconds
+        setTimeout(() => {
+          setFormStatus("");
+        }, 3000);
+      }
+    } catch (error) {
+      setFormStatus(`Error: ${error instanceof Error ? error.message : 'Failed to submit'}`);
+      
+      // Clear error message after 3 seconds
+      setTimeout(() => {
+        setFormStatus("");
+      }, 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section id="contact" ref={sectionRef} className="py-24 bg-neutral-950">
@@ -48,31 +103,61 @@ export default function Contact() {
             <div className="bg-gradient-to-br from-neutral-900 to-black border border-cyan-400/20 rounded-2xl p-8">
               <h3 className="bebas text-3xl text-white mb-6">Send Us a Message</h3>
               
-              <form className="space-y-6">
-                <div>
+              <form className="space-y-6" onSubmit={handleSubmit}>
+
+
+<div>
+  <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">
+    Full Name
+  </label>
+  <input
+    type="text"
+    id="name"
+    name="name"
+    required
+    disabled={isSubmitting}
+    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
+    placeholder="John Doe"
+    pattern="[A-Za-z\s]+"
+    title="Name can contain only letters"
+  />
+</div>
+
+<div>
+  <label htmlFor="phone" className="block text-sm font-medium text-gray-400 mb-2">
+    Phone Number
+  </label>
+  <input
+    type="tel"
+    id="phone"
+    name="number"
+    required
+    disabled={isSubmitting}
+    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
+    placeholder="1234567890"
+    pattern="\d{10}"
+    title="Phone number must be 10 digits"
+  />
+</div>
+
+
+
+
+                {/* <div>
                   <label htmlFor="name" className="block text-sm font-medium text-gray-400 mb-2">
                     Full Name
                   </label>
                   <input
                     type="text"
                     id="name"
-                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors"
+                    name="name"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
                     placeholder="John Doe"
                   />
                 </div>
-                
-                <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-400 mb-2">
-                    Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors"
-                    placeholder="john@example.com"
-                  />
-                </div>
-                
+              
                 <div>
                   <label htmlFor="phone" className="block text-sm font-medium text-gray-400 mb-2">
                     Phone Number
@@ -80,10 +165,13 @@ export default function Contact() {
                   <input
                     type="tel"
                     id="phone"
-                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors"
+                    name="number"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors disabled:opacity-50"
                     placeholder="+1 (555) 000-0000"
                   />
-                </div>
+                </div> */}
                 
                 <div>
                   <label htmlFor="message" className="block text-sm font-medium text-gray-400 mb-2">
@@ -91,17 +179,32 @@ export default function Contact() {
                   </label>
                   <textarea
                     id="message"
+                    name="message"
                     rows={4}
-                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors resize-none"
+                    required
+                    disabled={isSubmitting}
+                    className="w-full px-4 py-3 bg-black border border-cyan-400/30 rounded-lg text-white focus:outline-none focus:border-cyan-400 transition-colors resize-none disabled:opacity-50"
                     placeholder="Tell us about your fitness goals..."
                   />
                 </div>
                 
+                {/* Status Message */}
+                {formStatus && (
+                  <div className={`p-4 rounded-lg border ${
+                    formStatus.includes('Error') 
+                      ? 'bg-red-900/20 border-red-500 text-red-400' 
+                      : 'bg-green-900/20 border-green-500 text-green-400'
+                  }`}>
+                    {formStatus}
+                  </div>
+                )}
+                
                 <button
                   type="submit"
-                  className="w-full py-4 bg-gradient-to-r from-cyan-400 to-cyan-500 text-black font-bold rounded-lg hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 transform hover:scale-105"
+                  disabled={isSubmitting}
+                  className="w-full py-4 bg-gradient-to-r from-cyan-400 to-cyan-500 text-black font-bold rounded-lg hover:shadow-2xl hover:shadow-cyan-400/50 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  SEND MESSAGE
+                  {isSubmitting ? 'SENDING...' : 'SEND MESSAGE'}
                 </button>
               </form>
             </div>
@@ -173,7 +276,7 @@ export default function Contact() {
               <h3 className="bebas text-2xl text-white mb-6">Follow Us</h3>
               <div className="flex space-x-4">
                 <a
-                  href="#"
+                  href="https://www.youtube.com/"
                   className="w-12 h-12 bg-cyan-400/10 rounded-lg flex items-center justify-center hover:bg-cyan-400/20 transition-colors group"
                 >
                   <Instagram className="w-6 h-6 text-cyan-400 group-hover:scale-110 transition-transform" />
